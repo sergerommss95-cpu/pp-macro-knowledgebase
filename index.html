@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macro Atelier — PowerPoint VBA via Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --cream: #F6F1EB;
+  --cream-deep: #EDE6DC;
+  --parchment: #FDFBF7;
+  --ink: #1C1917;
+  --ink-soft: #44403C;
+  --ink-muted: #78716C;
+  --ink-faint: #A8A29E;
+  --ink-ghost: #D6D3D1;
+  --copper: #B45309;
+  --copper-light: #D97706;
+  --copper-pale: #FEF3C7;
+  --copper-wash: rgba(180,83,9,0.06);
+  --teal: #115E59;
+  --teal-pale: #CCFBF1;
+  --slate: #334155;
+  --rose: #9F1239;
+  --rose-pale: #FFF1F2;
+  --code-bg: #1C1917;
+  --code-surface: #292524;
+  --sidebar-bg: #1C1917;
+  --sidebar-surface: #292524;
+  --sidebar-text: #D6D3D1;
+  --sidebar-text-dim: #78716C;
+  --sidebar-active: #B45309;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'Menlo', monospace;
+  --sidebar-w: 272px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.6; display: flex; min-height: 100vh; }
+::selection { background: var(--copper-pale); color: var(--copper); }
+
+/* ═════════════════════════════════════
+   SIDEBAR — Refined dark panel
+   ═════════════════════════════════════ */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  z-index: 100;
+  display: flex; flex-direction: column;
+  transition: transform 0.4s var(--ease-out);
+  border-right: 1px solid rgba(255,255,255,0.04);
+}
+
+.sb-brand {
+  padding: 32px 28px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sb-brand h1 {
+  font-family: var(--serif);
+  font-size: 1.5rem; font-weight: 300;
+  color: #FFF; letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+
+.sb-brand h1 em {
+  font-style: italic; font-weight: 400;
+  color: var(--copper-light);
+}
+
+.sb-brand .sb-sub {
+  font-size: 0.65rem; font-weight: 500;
+  color: var(--sidebar-text-dim);
+  margin-top: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sb-search {
+  padding: 14px 16px 6px;
+}
+
+.sb-search input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 9px 12px 9px 34px;
+  color: var(--sidebar-text);
+  font-family: var(--sans); font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2378716C' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath d='M13 13l-3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 11px center;
+}
+
+.sb-search input::placeholder { color: var(--sidebar-text-dim); }
+.sb-search input:focus { border-color: var(--copper); background: rgba(255,255,255,0.08); }
+
+.sb-nav {
+  flex: 1; overflow-y: auto;
+  padding: 6px 10px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.sb-label {
+  font-size: 0.58rem; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--sidebar-text-dim);
+  padding: 18px 14px 5px;
+}
+
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  font-size: 0.79rem; font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  position: relative;
+}
+
+.sb-item:hover { background: var(--sidebar-surface); color: #FFF; }
+
+.sb-item.active {
+  background: var(--sidebar-surface);
+  color: #FFF; font-weight: 500;
+}
+
+.sb-item.active::after {
+  content: '';
+  position: absolute; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  width: 5px; height: 5px;
+  background: var(--copper-light);
+  border-radius: 50%;
+}
+
+.sb-icon {
+  width: 16px; height: 16px;
+  flex-shrink: 0; opacity: 0.5;
+}
+
+.sb-item:hover .sb-icon, .sb-item.active .sb-icon { opacity: 0.9; }
+
+.sb-count {
+  margin-left: auto;
+  font-size: 0.62rem; font-weight: 500;
+  color: var(--sidebar-text-dim);
+  background: rgba(255,255,255,0.06);
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+
+.sb-toggle {
+  display: none; position: fixed;
+  top: 14px; left: 14px; z-index: 200;
+  width: 40px; height: 40px;
+  background: var(--ink);
+  border: none; border-radius: 8px;
+  cursor: pointer; color: #FFF;
+  align-items: center; justify-content: center;
+}
+
+/* ═════════════════════════════════════
+   MAIN AREA
+   ═════════════════════════════════════ */
+.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+
+.content {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 56px 44px 140px;
+}
+
+/* ═════════════════════════════════════
+   SECTION HEADERS — Editorial feel
+   ═════════════════════════════════════ */
+.sec { margin-bottom: 72px; scroll-margin-top: 24px; }
+
+.sec-label {
+  font-size: 0.62rem; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--copper);
+  margin-bottom: 6px;
+}
+
+.sec h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.sec h2 em { font-style: italic; font-weight: 400; }
+
+.sec-intro {
+  font-size: 0.95rem; color: var(--ink-soft);
+  max-width: 580px; line-height: 1.7;
+  margin-bottom: 36px;
+}
+
+/* Thin decorative rule */
+.rule {
+  width: 48px; height: 1px;
+  background: var(--copper);
+  margin: 32px 0;
+  opacity: 0.4;
+}
+
+/* ═════════════════════════════════════
+   COLLAPSIBLE MACRO ENTRIES
+   ═════════════════════════════════════ */
+.macro {
+  border: 1px solid rgba(28,25,23,0.07);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: var(--parchment);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.macro:hover { border-color: rgba(28,25,23,0.12); }
+
+.macro-head {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  cursor: pointer; user-select: none;
+}
+
+.macro-head h4 {
+  font-family: var(--sans);
+  font-size: 0.88rem; font-weight: 600;
+  color: var(--ink);
+  display: flex; align-items: center; gap: 10px;
+}
+
+.macro-head h4 .mi { font-size: 1.05rem; opacity: 0.7; }
+
+.macro-tags { display: flex; gap: 5px; margin-left: auto; margin-right: 16px; }
+
+.tag {
+  font-size: 0.6rem; font-weight: 500;
+  padding: 2px 8px; border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tag-new { background: var(--teal-pale); color: var(--teal); }
+.tag-essential { background: var(--copper-pale); color: var(--copper); }
+.tag-advanced { background: #EDE9FE; color: #6D28D9; }
+.tag-agency { background: var(--rose-pale); color: var(--rose); }
+
+.macro-arrow {
+  width: 18px; height: 18px;
+  color: var(--ink-faint);
+  transition: transform 0.3s var(--ease-out);
+  flex-shrink: 0;
+}
+
+.macro.open .macro-arrow { transform: rotate(180deg); }
+
+.macro-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out);
+}
+
+.macro.open .macro-body { grid-template-rows: 1fr; }
+
+.macro-inner {
+  overflow: hidden;
+}
+
+.macro-content { padding: 0 22px 22px; }
+
+.macro-content p, .macro-content li {
+  font-size: 0.87rem; color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.macro-content ul, .macro-content ol { padding-left: 20px; margin-top: 8px; }
+.macro-content li { margin-bottom: 3px; }
+
+/* ═════════════════════════════════════
+   CODE BLOCKS — Precise & warm
+   ═════════════════════════════════════ */
+.code-wrap {
+  background: var(--code-bg);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+}
+
+.code-bar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--code-surface);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.code-lang {
+  font-family: var(--mono);
+  font-size: 0.62rem; font-weight: 500;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.cp-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 0.66rem; font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cp-btn:hover { background: rgba(255,255,255,0.12); color: #FFF; }
+.cp-btn.ok { background: rgba(21,128,61,0.3); border-color: rgba(21,128,61,0.4); color: #86EFAC; }
+
+pre {
+  padding: 18px 16px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+pre code {
+  font-family: var(--mono);
+  font-size: 0.78rem; line-height: 1.75;
+  color: #E7E5E4;
+  tab-size: 4;
+}
+
+.k { color: #C4B5FD; }
+.s { color: #86EFAC; }
+.c { color: #6C7086; font-style: italic; }
+.f { color: #93C5FD; }
+.n { color: #FCD34D; }
+.p { color: #FDE68A; }
+.t { color: #67E8F9; }
+.o { color: #5EEAD4; }
+
+/* ═════════════════════════════════════
+   PROMPT BLOCKS — Copper accent
+   ═════════════════════════════════════ */
+.prompt {
+  background: var(--copper-wash);
+  border: 1px solid rgba(180,83,9,0.12);
+  border-radius: 8px;
+  padding: 20px 22px 18px;
+  margin: 14px 0;
+  position: relative;
+}
+
+.prompt-label {
+  position: absolute;
+  top: -8px; left: 14px;
+  background: var(--copper);
+  color: #FFF;
+  font-size: 0.54rem; font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: 3px;
+}
+
+.prompt-text {
+  font-family: var(--mono);
+  font-size: 0.8rem; color: var(--ink);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.prompt-cp {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--copper);
+  color: #FFF; border: none;
+  font-family: var(--sans);
+  font-size: 0.64rem; font-weight: 600;
+  padding: 4px 11px; border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.prompt-cp:hover { background: #92400E; }
+.prompt-cp.ok { background: var(--teal); }
+
+/* ═════════════════════════════════════
+   CALLOUTS
+   ═════════════════════════════════════ */
+.callout {
+  display: flex; gap: 14px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 14px 0;
+  align-items: flex-start;
+}
+
+.callout .ci { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.callout p { font-size: 0.85rem; line-height: 1.65; }
+
+.callout.tip { background: var(--teal-pale); border: 1px solid rgba(17,94,89,0.15); }
+.callout.tip p { color: #134E4A; }
+.callout.warn { background: #FFFBEB; border: 1px solid rgba(180,83,9,0.15); }
+.callout.warn p { color: #78350F; }
+.callout.danger { background: var(--rose-pale); border: 1px solid rgba(159,18,57,0.12); }
+.callout.danger p { color: #881337; }
+.callout.info { background: #EFF6FF; border: 1px solid rgba(37,99,235,0.12); }
+.callout.info p { color: #1E3A5F; }
+
+/* ═════════════════════════════════════
+   TABLES
+   ═════════════════════════════════════ */
+.tbl-wrap {
+  overflow-x: auto;
+  margin: 14px 0;
+  border-radius: 8px;
+  border: 1px solid rgba(28,25,23,0.08);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+
+thead { background: var(--cream-deep); }
+
+th {
+  text-align: left; padding: 10px 16px;
+  font-weight: 600; font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  border-bottom: 1px solid rgba(28,25,23,0.08);
+}
+
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(28,25,23,0.04);
+  color: var(--ink-soft);
+}
+
+tbody tr:hover { background: rgba(28,25,23,0.02); }
+
+td code, p code, li code {
+  font-family: var(--mono);
+  font-size: 0.8em;
+  background: var(--cream-deep);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--copper);
+}
+
+/* ═════════════════════════════════════
+   WORKFLOW STEPS
+   ═════════════════════════════════════ */
+.flow { position: relative; padding-left: 32px; margin: 16px 0; }
+
+.flow::before {
+  content: '';
+  position: absolute; left: 11px; top: 6px; bottom: 6px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--copper), var(--teal));
+  opacity: 0.3;
+}
+
+.flow-step { position: relative; margin-bottom: 20px; }
+
+.flow-step::before {
+  content: attr(data-n);
+  position: absolute; left: -32px; top: 1px;
+  width: 22px; height: 22px;
+  border: 1.5px solid var(--copper);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; font-weight: 700;
+  color: var(--copper);
+  background: var(--parchment);
+}
+
+.flow-step h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 2px; }
+.flow-step p { font-size: 0.82rem; color: var(--ink-muted); }
+
+/* ═════════════════════════════════════
+   KBD KEYS
+   ═════════════════════════════════════ */
+kbd {
+  display: inline-block;
+  background: var(--cream-deep);
+  border: 1px solid rgba(28,25,23,0.1);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink);
+}
+
+/* ═════════════════════════════════════
+   GRID STAT CARDS
+   ═════════════════════════════════════ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.stat {
+  text-align: center;
+  padding: 20px 12px;
+  border: 1px solid rgba(28,25,23,0.06);
+  border-radius: 8px;
+  background: var(--parchment);
+}
+
+.stat-n {
+  font-family: var(--serif);
+  font-size: 2.2rem; font-weight: 300;
+  color: var(--copper);
+  line-height: 1;
+}
+
+.stat-l {
+  font-size: 0.7rem; color: var(--ink-muted);
+  margin-top: 4px; font-weight: 500;
+}
+
+/* ═════════════════════════════════════
+   BACK TO TOP
+   ═════════════════════════════════════ */
+.btt {
+  position: fixed; bottom: 28px; right: 28px;
+  width: 42px; height: 42px;
+  background: var(--ink); color: #FFF;
+  border: none; border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(10px);
+  transition: all 0.3s var(--ease-out);
+  z-index: 50;
+}
+
+.btt.vis { opacity: 1; transform: translateY(0); }
+.btt:hover { background: var(--copper); }
+
+/* ═════════════════════════════════════
+   HIDDEN UTILITY
+   ═════════════════════════════════════ */
+.sec.hidden { display: none; }
+.macro.hidden { display: none; }
+
+strong { font-weight: 600; color: var(--ink); }
+a { color: var(--copper); text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid rgba(28,25,23,0.06); margin: 28px 0; }
+
+/* ═════════════════════════════════════
+   RESPONSIVE
+   ═════════════════════════════════════ */
+@media (max-width: 1024px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sb-toggle { display: flex; }
+  .main { margin-left: 0; }
+  .content { padding: 60px 18px 100px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .sb-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 99; opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .sb-overlay.vis { opacity: 1; pointer-events: auto; }
+}
+
+/* ═════════════════════════════════════
+   ENTRANCE ANIMATIONS
+   ═════════════════════════════════════ */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sec { animation: rise 0.55s var(--ease-out) both; }
+.sec:nth-child(2) { animation-delay: 0.04s; }
+.sec:nth-child(3) { animation-delay: 0.08s; }
+
+/* ═════════════════════════════════════
+   HERO AREA — refined landing
+   ═════════════════════════════════════ */
+.hero {
+  padding-bottom: 48px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid rgba(28,25,23,0.07);
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 5.5vw, 3.6rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.hero h1 em { font-style: italic; font-weight: 400; color: var(--copper); }
+
+.hero-sub {
+  font-size: 1.02rem;
+  color: var(--ink-soft);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.hero-keys {
+  display: flex; gap: 20px;
+  font-size: 0.75rem; color: var(--ink-muted);
+}
+
+.hero-keys span { display: flex; align-items: center; gap: 6px; }
+
+/* Category pill navigation */
+.cat-nav {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 24px;
+}
+
+.cat-pill {
+  font-size: 0.72rem; font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(28,25,23,0.1);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--sans);
+}
+
+.cat-pill:hover { border-color: var(--copper); color: var(--copper); }
+.cat-pill.active { background: var(--ink); color: #FFF; border-color: var(--ink); }
+</style>
+</head>
+<body>
+
+<button class="sb-toggle" onclick="toggleSB()" aria-label="Menu">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="sb-overlay" onclick="toggleSB()"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <h1>Macro <em>Atelier</em></h1>
+    <div class="sb-sub">PowerPoint VBA &middot; Claude Code</div>
+  </div>
+
+  <div class="sb-search">
+    <input type="text" id="search" placeholder="Search macros, prompts..." oninput="doSearch(this.value)">
+  </div>
+
+  <div class="sb-nav" id="sbnav">
+    <div class="sb-label">Foundation</div>
+    <a class="sb-item active" data-to="hero-sec" onclick="go('hero-sec')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Overview
+    </a>
+    <a class="sb-item" data-to="setup" onclick="go('setup')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>
+      Environment Setup
+    </a>
+    <a class="sb-item" data-to="mental-model" onclick="go('mental-model')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Mental Model
+    </a>
+
+    <div class="sb-label">Macro Library</div>
+    <a class="sb-item" data-to="slides" onclick="go('slides')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Slides <span class="sb-count">14</span>
+    </a>
+    <a class="sb-item" data-to="text" onclick="go('text')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      Text &amp; Type <span class="sb-count">12</span>
+    </a>
+    <a class="sb-item" data-to="shapes" onclick="go('shapes')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Shapes &amp; Layout <span class="sb-count">13</span>
+    </a>
+    <a class="sb-item" data-to="tables" onclick="go('tables')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+      Tables <span class="sb-count">8</span>
+    </a>
+    <a class="sb-item" data-to="brand" onclick="go('brand')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+      Colors &amp; Branding <span class="sb-count">9</span>
+    </a>
+    <a class="sb-item" data-to="images" onclick="go('images')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      Images &amp; Media <span class="sb-count">10</span>
+    </a>
+    <a class="sb-item" data-to="charts" onclick="go('charts')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      Charts &amp; Data <span class="sb-count">8</span>
+    </a>
+    <a class="sb-item" data-to="animation" onclick="go('animation')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Animation <span class="sb-count">7</span>
+    </a>
+    <a class="sb-item" data-to="masters" onclick="go('masters')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8l-2 4h12l-2-4z"/></svg>
+      Masters &amp; Templates <span class="sb-count">9</span>
+    </a>
+    <a class="sb-item" data-to="notes" onclick="go('notes')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Speaker Notes <span class="sb-count">5</span>
+    </a>
+    <a class="sb-item" data-to="export" onclick="go('export')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export &amp; Delivery <span class="sb-count">9</span>
+    </a>
+    <a class="sb-item" data-to="batch" onclick="go('batch')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+      Batch Ops <span class="sb-count">7</span>
+    </a>
+    <a class="sb-item" data-to="cleanup" onclick="go('cleanup')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+      Cleanup &amp; QA <span class="sb-count">10</span>
+    </a>
+
+    <div class="sb-label">Reference</div>
+    <a class="sb-item" data-to="objmodel" onclick="go('objmodel')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Object Model
+    </a>
+    <a class="sb-item" data-to="cookbook" onclick="go('cookbook')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Prompt Cookbook
+    </a>
+    <a class="sb-item" data-to="errors" onclick="go('errors')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Troubleshooting
+    </a>
+    <a class="sb-item" data-to="workflows" onclick="go('workflows')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Workflows
+    </a>
+    <a class="sb-item" data-to="keyboard" onclick="go('keyboard')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"/></svg>
+      Keyboard Ref
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+<div class="content">
+
+<!-- ═══════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════ -->
+<div class="sec hero" id="hero-sec">
+  <h1>The PowerPoint<br><em>Macro Atelier</em></h1>
+  <p class="hero-sub">A curated library of production-ready VBA macros and Claude Code prompts for design teams who build corporate presentations at scale.</p>
+  <div class="hero-keys">
+    <span><kbd>/</kbd> Search</span>
+    <span><kbd>Esc</kbd> Clear</span>
+    <span>Click any macro to expand</span>
+  </div>
+
+  <div class="stats" style="margin-top:28px">
+    <div class="stat"><div class="stat-n">120+</div><div class="stat-l">VBA Macros</div></div>
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Claude Prompts</div></div>
+    <div class="stat"><div class="stat-n">15</div><div class="stat-l">Workflow Recipes</div></div>
+    <div class="stat"><div class="stat-n">16</div><div class="stat-l">Categories</div></div>
+  </div>
+
+  <div class="callout tip">
+    <span class="ci">&#9889;</span>
+    <p><strong>30-second start:</strong> Open PowerPoint &rarr; <kbd>Alt</kbd>+<kbd>F11</kbd> &rarr; Insert Module &rarr; open Claude Code in terminal &rarr; ask for your macro &rarr; paste &rarr; <kbd>F5</kbd> to run. Save as <code>.pptm</code> to keep macros.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ENVIRONMENT SETUP
+     ═══════════════════════════════════════ -->
+<div class="sec" id="setup">
+  <div class="sec-label">Foundation</div>
+  <h2>Environment <em>Setup</em></h2>
+  <p class="sec-intro">Get your PowerPoint + Claude Code pipeline running in under 5 minutes.</p>
+
+  <div class="macro open">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#9881;&#65039;</span> Enable the Developer Tab</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <ol>
+        <li><strong>File</strong> &rarr; <strong>Options</strong> &rarr; <strong>Customize Ribbon</strong></li>
+        <li>Check <strong>Developer</strong> in the right column</li>
+        <li>Click OK &mdash; now you have the Developer tab with Visual Basic, Macros, and Macro Security</li>
+      </ol>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128274;</span> Macro Security Settings</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Developer tab &rarr; Macro Security:</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Setting</th><th>When to Use</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Disable all with notification</strong></td><td>Recommended for daily work. Prompted each time.</td></tr>
+            <tr><td><strong>Enable all macros</strong></td><td>During active development only. Switch back after.</td></tr>
+            <tr><td><strong>Trusted Locations</strong></td><td>Best long-term: add your project folders so macros run without prompts.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128187;</span> The VBA Editor (VBE)</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Open with <kbd>Alt</kbd>+<kbd>F11</kbd>. Key areas:</p>
+      <ul>
+        <li><strong>Project Explorer</strong> (left) &mdash; your presentation's modules</li>
+        <li><strong>Code Window</strong> (center) &mdash; write/paste macros here</li>
+        <li><strong>Immediate Window</strong> <kbd>Ctrl</kbd>+<kbd>G</kbd> &mdash; test one-liners live</li>
+        <li><strong>Insert &rarr; Module</strong> &mdash; creates a new module for your macros</li>
+      </ul>
+      <div class="callout info">
+        <span class="ci">&#128161;</span>
+        <p>Each <code>.pptm</code> has its own VBA project. For reusable macros across all files, create a <strong>PowerPoint Add-in (.ppam)</strong>.</p>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128640;</span> Claude Code Session Starter</h4>
+      <span class="tag tag-essential">Essential</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Paste this as your opening prompt to set context for the session:</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">You are a PowerPoint VBA macro expert working for a creative agency that builds corporate presentations.
+
+Rules:
+- Always use On Error GoTo error handling in every Sub
+- Comment the code clearly with meaningful variable names
+- Support tables, grouped shapes, and nested elements
+- Assume 16:9 widescreen (960x540 pt) unless specified
+- Show MsgBox with count/summary when macro completes
+- Target PowerPoint 2019+ / Microsoft 365
+- If a task requires recursion through groups, always include a recursive helper function</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128230;</span> File Format Reference</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Extension</th><th>Macros?</th><th>When to Use</th></tr></thead>
+          <tbody>
+            <tr><td><code>.pptx</code></td><td>No</td><td>Final client delivery</td></tr>
+            <tr><td><code>.pptm</code></td><td>Yes</td><td>Working files with macros</td></tr>
+            <tr><td><code>.ppam</code></td><td>Yes</td><td>Reusable macro library add-in</td></tr>
+            <tr><td><code>.potm</code></td><td>Yes</td><td>Template with built-in macros</td></tr>
+            <tr><td><code>.ppsx</code></td><td>No</td><td>Auto-play show</td></tr>
+            <tr><td><code>.ppsm</code></td><td>Yes</td><td>Auto-play with macros</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MENTAL MODEL
+     ═══════════════════════════════════════ -->
+<div class="sec" id="mental-model">
+  <div class="sec-label">Foundation</div>
+  <h2>The <em>Mental Model</em></h2>
+  <p class="sec-intro">How to think about PowerPoint automation and how to describe tasks to Claude.</p>
+
+  <div class="macro open">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#127891;</span> Object Hierarchy</h4>
+      <span class="tag tag-essential">Essential</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Every VBA macro navigates this tree. Understand it and you can describe any task to Claude:</p>
+      <div class="code-wrap">
+        <div class="code-bar"><span class="code-lang">Hierarchy</span></div>
+        <pre><code><span class="t">Application</span>                     <span class="c">' PowerPoint itself</span>
+  <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">Presentations</span>               <span class="c">' All open files</span>
+       <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">Presentation</span>            <span class="c">' One .pptx/.pptm</span>
+            <span class="o">&#9500;&#9472;&#9472;</span> <span class="t">Slides</span>              <span class="c">' Collection of slides</span>
+            <span class="o">&#9474;</span>    <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">Slide</span>           <span class="c">' Single slide</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9500;&#9472;&#9472;</span> <span class="t">Shapes</span>   <span class="c">' All objects on slide</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9500;&#9472;&#9472;</span> <span class="p">TextFrame</span> <span class="o">&rarr;</span> <span class="p">TextRange</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9500;&#9472;&#9472;</span> <span class="p">Fill / Line</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9500;&#9472;&#9472;</span> <span class="p">Table</span> <span class="o">&rarr;</span> <span class="p">Cell</span> <span class="o">&rarr;</span> <span class="p">Shape</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9500;&#9472;&#9472;</span> <span class="p">Chart</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9500;&#9472;&#9472;</span> <span class="p">GroupItems</span> <span class="c">' nested shapes</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9474;</span>    <span class="o">&#9492;&#9472;&#9472;</span> <span class="p">PictureFormat</span>
+            <span class="o">&#9474;</span>         <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">SlideShowTransition</span>
+            <span class="o">&#9500;&#9472;&#9472;</span> <span class="t">SlideMaster</span>
+            <span class="o">&#9474;</span>    <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">CustomLayouts</span>
+            <span class="o">&#9500;&#9472;&#9472;</span> <span class="t">Designs</span>             <span class="c">' Themes</span>
+            <span class="o">&#9492;&#9472;&#9472;</span> <span class="t">Tags</span>                <span class="c">' Custom metadata</span></code></pre>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128172;</span> How to Describe Macros to Claude</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>The better your prompt, the better the macro. Structure your requests with:</p>
+      <ol>
+        <li><strong>What</strong> &mdash; the specific action ("resize all images")</li>
+        <li><strong>Where</strong> &mdash; scope (all slides? current slide? selected shapes?)</li>
+        <li><strong>Rules</strong> &mdash; constraints ("only images wider than 800px", "skip grouped shapes")</li>
+        <li><strong>Output</strong> &mdash; expected result ("center on slide, maintain aspect ratio")</li>
+        <li><strong>Report</strong> &mdash; what to show when done ("count of images processed")</li>
+      </ol>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro for PowerPoint that:
+- Goes through ALL slides in the active presentation
+- Finds every image/picture shape
+- Resizes each to exactly 800pt wide, maintaining aspect ratio
+- Centers each image horizontally on the slide
+- Skips any image inside a group
+- Shows a message box with count of images processed when done</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128260;</span> The Iteration Loop</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="flow">
+        <div class="flow-step" data-n="1">
+          <h4>Describe &rarr; Claude writes macro</h4>
+          <p>Be specific about your presentation structure and needs.</p>
+        </div>
+        <div class="flow-step" data-n="2">
+          <h4>Paste into VBE &rarr; Run on test file</h4>
+          <p>Always test on a COPY first. Never untested macros on live client files.</p>
+        </div>
+        <div class="flow-step" data-n="3">
+          <h4>Check results &rarr; Report issues back</h4>
+          <p>Tell Claude exactly what went wrong: error messages, wrong shapes affected.</p>
+        </div>
+        <div class="flow-step" data-n="4">
+          <h4>Claude fixes &rarr; Re-test &rarr; Ship</h4>
+          <p>Save working macros in your personal library module for reuse.</p>
+        </div>
+      </div>
+      <div class="callout warn">
+        <span class="ci">&#9888;&#65039;</span>
+        <p><strong>Golden rule:</strong> Always <kbd>Ctrl</kbd>+<kbd>S</kbd> before running any new macro. VBA has no undo.</p>
+      </div>
+    </div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE OPERATIONS
+     ═══════════════════════════════════════ -->
+<div class="sec" id="slides">
+  <div class="sec-label">Macro Library</div>
+  <h2>Slide <em>Operations</em></h2>
+  <p class="sec-intro">Create, duplicate, reorder, delete, and manipulate slides programmatically.</p>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128196;</span> Duplicate Slide with New Layout</h4>
+      <span class="tag tag-essential">Essential</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Duplicates the current slide and applies a different layout by name.</p>
+      <div class="code-wrap">
+        <div class="code-bar"><span class="code-lang">VBA</span><button class="cp-btn" onclick="cpCode(this)">Copy</button></div>
+        <pre><code><span class="k">Sub</span> <span class="f">DuplicateWithLayout</span>(<span class="p">layoutName</span> <span class="k">As</span> <span class="t">String</span>)
+    <span class="k">On Error GoTo</span> ErrHandler
+    <span class="k">Dim</span> sld <span class="k">As</span> <span class="t">Slide</span>, newSld <span class="k">As</span> <span class="t">Slide</span>
+    <span class="k">Dim</span> lo <span class="k">As</span> <span class="t">CustomLayout</span>
+
+    <span class="k">Set</span> sld = <span class="p">ActiveWindow</span>.<span class="p">View</span>.<span class="p">Slide</span>
+    sld.<span class="f">Duplicate</span>
+    <span class="k">Set</span> newSld = <span class="p">ActivePresentation</span>.<span class="p">Slides</span>(sld.<span class="p">SlideIndex</span> + <span class="n">1</span>)
+
+    <span class="k">For Each</span> lo <span class="k">In</span> <span class="p">ActivePresentation</span>.<span class="p">SlideMaster</span>.<span class="p">CustomLayouts</span>
+        <span class="k">If</span> lo.<span class="p">Name</span> = layoutName <span class="k">Then</span>
+            newSld.<span class="p">CustomLayout</span> = lo
+            <span class="k">Exit For</span>
+        <span class="k">End If</span>
+    <span class="k">Next</span> lo
+
+    <span class="f">MsgBox</span> <span class="s">"Duplicated with layout: "</span> &amp; layoutName
+    <span class="k">Exit Sub</span>
+ErrHandler:
+    <span class="f">MsgBox</span> <span class="s">"Error: "</span> &amp; Err.<span class="p">Description</span>, <span class="n">vbExclamation</span>
+<span class="k">End Sub</span></code></pre>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128209;</span> Auto-Generate Table of Contents</h4>
+      <span class="tag tag-agency">Agency</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Reads all slide titles and generates a TOC slide at position 2.</p>
+      <div class="code-wrap">
+        <div class="code-bar"><span class="code-lang">VBA</span><button class="cp-btn" onclick="cpCode(this)">Copy</button></div>
+        <pre><code><span class="k">Sub</span> <span class="f">GenerateTOC</span>()
+    <span class="k">On Error GoTo</span> ErrHandler
+    <span class="k">Dim</span> pres <span class="k">As</span> <span class="t">Presentation</span>, sld <span class="k">As</span> <span class="t">Slide</span>
+    <span class="k">Dim</span> tocSlide <span class="k">As</span> <span class="t">Slide</span>
+    <span class="k">Dim</span> tocText <span class="k">As</span> <span class="t">String</span>, slideTitle <span class="k">As</span> <span class="t">String</span>
+    <span class="k">Dim</span> itemNum <span class="k">As</span> <span class="t">Long</span>
+
+    <span class="k">Set</span> pres = <span class="p">ActivePresentation</span>
+
+    <span class="k">For Each</span> sld <span class="k">In</span> pres.<span class="p">Slides</span>
+        <span class="k">If</span> sld.<span class="p">SlideIndex</span> > <span class="n">1</span> <span class="k">Then</span>
+            <span class="k">On Error Resume Next</span>
+            slideTitle = sld.<span class="p">Shapes</span>.<span class="p">Title</span>.<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Text</span>
+            <span class="k">On Error GoTo</span> ErrHandler
+            <span class="k">If</span> <span class="f">Len</span>(slideTitle) > <span class="n">0</span> <span class="k">Then</span>
+                itemNum = itemNum + <span class="n">1</span>
+                tocText = tocText &amp; itemNum &amp; <span class="s">".  "</span> &amp; slideTitle &amp; <span class="f">vbCrLf</span>
+            <span class="k">End If</span>
+            slideTitle = <span class="s">""</span>
+        <span class="k">End If</span>
+    <span class="k">Next</span> sld
+
+    <span class="k">Set</span> tocSlide = pres.<span class="p">Slides</span>.<span class="f">Add</span>(<span class="n">2</span>, <span class="n">ppLayoutText</span>)
+    tocSlide.<span class="p">Shapes</span>.<span class="p">Title</span>.<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Text</span> = <span class="s">"Table of Contents"</span>
+    tocSlide.<span class="p">Shapes</span>(<span class="n">2</span>).<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Text</span> = tocText
+    tocSlide.<span class="p">Shapes</span>(<span class="n">2</span>).<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Font</span>.<span class="p">Size</span> = <span class="n">14</span>
+
+    <span class="f">MsgBox</span> <span class="s">"TOC created with "</span> &amp; itemNum &amp; <span class="s">" items."</span>
+    <span class="k">Exit Sub</span>
+ErrHandler:
+    <span class="f">MsgBox</span> <span class="s">"Error: "</span> &amp; Err.<span class="p">Description</span>, <span class="n">vbExclamation</span>
+<span class="k">End Sub</span></code></pre>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128465;&#65039;</span> Delete Empty Slides</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Finds and removes slides that have no content (empty placeholders only). Loops backwards for safe deletion.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that deletes all empty slides from the active PowerPoint. A slide is empty if none of its shapes contain text and all shapes are placeholders. Loop backwards for safe deletion. Report how many were removed.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128202;</span> Custom Slide Numbers (01 / 24)</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Adds styled slide numbers like "01 / 24" at the bottom-right. Better than built-in numbers.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that adds custom slide numbers to every slide in format "01 / 24" (zero-padded current / total). Position: bottom-right (820, 500). Font: Calibri 9pt, gray #808080. Name each text box "CustomSlideNum" so running it again removes old numbers first.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128194;</span> Insert Section Dividers</h4>
+      <span class="tag tag-agency">Agency</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Insert branded section divider slides with dark background, white title, and gold section numbers.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that inserts section divider slides. Parameters: an array of section names. Each divider has:
+- Blank layout with solid navy background RGB(30,40,65)
+- Section title: 36pt Calibri Light bold, white, positioned at (72, 200)
+- Section number above: "01", "02" etc in 16pt Calibri, gold RGB(200,170,100) at (72, 160)
+Add them at the end of the presentation.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128257;</span> Reorder Slides Alphabetically by Title</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that sorts all slides in the active PowerPoint alphabetically by their title text. Slides without titles should go to the end. Use a bubble sort approach with Slide.MoveTo.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128203;</span> Clone Slide Range to New Presentation</h4>
+      <span class="tag tag-new">New</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that copies slides 5 through 15 from the active presentation into a brand new presentation, keeping the source formatting. Save the new file with "_extract" appended to the original filename.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128200;</span> Deck Statistics Report</h4>
+      <span class="tag tag-new">New</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Generates a comprehensive report: slide count, total shapes, image count, table count, chart count, total word count, unique fonts, file size.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that generates a statistics report for the active PowerPoint:
+- Total slides, shapes, images, tables, charts
+- Total word count across all text
+- List of unique font names used
+- List of unique font sizes used
+- Count of shapes per slide (flag any with 20+)
+- File path and estimated file size
+Display in a MsgBox or new slide.</div>
+      </div>
+    </div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TEXT & TYPOGRAPHY
+     ═══════════════════════════════════════ -->
+<div class="sec" id="text">
+  <div class="sec-label">Macro Library</div>
+  <h2>Text &amp; <em>Typography</em></h2>
+  <p class="sec-intro">Bulk font changes, find &amp; replace, text formatting, and typography consistency across your entire deck.</p>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#127912;</span> Global Font Replacement</h4>
+      <span class="tag tag-essential">Essential</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Replaces ALL instances of one font with another, including inside tables, groups, and charts.</p>
+      <div class="code-wrap">
+        <div class="code-bar"><span class="code-lang">VBA</span><button class="cp-btn" onclick="cpCode(this)">Copy</button></div>
+        <pre><code><span class="k">Sub</span> <span class="f">GlobalFontReplace</span>(<span class="p">oldFont</span> <span class="k">As</span> <span class="t">String</span>, <span class="p">newFont</span> <span class="k">As</span> <span class="t">String</span>)
+    <span class="k">On Error GoTo</span> ErrHandler
+    <span class="k">Dim</span> sld <span class="k">As</span> <span class="t">Slide</span>, count <span class="k">As</span> <span class="t">Long</span>
+
+    <span class="k">For Each</span> sld <span class="k">In</span> <span class="p">ActivePresentation</span>.<span class="p">Slides</span>
+        count = count + <span class="f">SwapFontInShapes</span>(sld.<span class="p">Shapes</span>, oldFont, newFont)
+    <span class="k">Next</span> sld
+
+    <span class="f">MsgBox</span> <span class="s">"Replaced '"</span> &amp; oldFont &amp; <span class="s">"' &rarr; '"</span> &amp; newFont &amp; <span class="s">"' in "</span> &amp; count &amp; <span class="s">" text runs."</span>
+    <span class="k">Exit Sub</span>
+ErrHandler:
+    <span class="f">MsgBox</span> <span class="s">"Error: "</span> &amp; Err.<span class="p">Description</span>, <span class="n">vbExclamation</span>
+<span class="k">End Sub</span>
+
+<span class="k">Private Function</span> <span class="f">SwapFontInShapes</span>(shps <span class="k">As</span> <span class="t">Shapes</span>, oF <span class="k">As</span> <span class="t">String</span>, nF <span class="k">As</span> <span class="t">String</span>) <span class="k">As</span> <span class="t">Long</span>
+    <span class="k">Dim</span> shp <span class="k">As</span> <span class="t">Shape</span>, c <span class="k">As</span> <span class="t">Long</span>, run <span class="k">As</span> <span class="t">TextRange</span>
+    <span class="k">For Each</span> shp <span class="k">In</span> shps
+        <span class="k">If</span> shp.<span class="p">HasTextFrame</span> <span class="k">Then</span>
+            <span class="k">For Each</span> run <span class="k">In</span> shp.<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Runs</span>
+                <span class="k">If</span> run.<span class="p">Font</span>.<span class="p">Name</span> = oF <span class="k">Then</span>
+                    run.<span class="p">Font</span>.<span class="p">Name</span> = nF: c = c + <span class="n">1</span>
+                <span class="k">End If</span>
+            <span class="k">Next</span> run
+        <span class="k">End If</span>
+        <span class="k">If</span> shp.<span class="p">HasTable</span> <span class="k">Then</span>
+            <span class="k">Dim</span> r <span class="k">As</span> <span class="t">Long</span>, cl <span class="k">As</span> <span class="t">Long</span>
+            <span class="k">For</span> r = <span class="n">1</span> <span class="k">To</span> shp.<span class="p">Table</span>.<span class="p">Rows</span>.<span class="p">Count</span>
+                <span class="k">For</span> cl = <span class="n">1</span> <span class="k">To</span> shp.<span class="p">Table</span>.<span class="p">Columns</span>.<span class="p">Count</span>
+                    <span class="k">Dim</span> cellRun <span class="k">As</span> <span class="t">TextRange</span>
+                    <span class="k">For Each</span> cellRun <span class="k">In</span> shp.<span class="p">Table</span>.<span class="p">Cell</span>(r, cl).<span class="p">Shape</span>.<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Runs</span>
+                        <span class="k">If</span> cellRun.<span class="p">Font</span>.<span class="p">Name</span> = oF <span class="k">Then</span>
+                            cellRun.<span class="p">Font</span>.<span class="p">Name</span> = nF: c = c + <span class="n">1</span>
+                        <span class="k">End If</span>
+                    <span class="k">Next</span>
+                <span class="k">Next</span> cl
+            <span class="k">Next</span> r
+        <span class="k">End If</span>
+        <span class="k">If</span> shp.<span class="p">Type</span> = <span class="n">msoGroup</span> <span class="k">Then</span>
+            <span class="k">Dim</span> gs <span class="k">As</span> <span class="t">Shape</span>
+            <span class="k">For Each</span> gs <span class="k">In</span> shp.<span class="p">GroupItems</span>
+                <span class="k">If</span> gs.<span class="p">HasTextFrame</span> <span class="k">Then</span>
+                    <span class="k">For Each</span> run <span class="k">In</span> gs.<span class="p">TextFrame</span>.<span class="p">TextRange</span>.<span class="p">Runs</span>
+                        <span class="k">If</span> run.<span class="p">Font</span>.<span class="p">Name</span> = oF <span class="k">Then</span>
+                            run.<span class="p">Font</span>.<span class="p">Name</span> = nF: c = c + <span class="n">1</span>
+                        <span class="k">End If</span>
+                    <span class="k">Next</span>
+                <span class="k">End If</span>
+            <span class="k">Next</span> gs
+        <span class="k">End If</span>
+    <span class="k">Next</span> shp
+    <span class="f">SwapFontInShapes</span> = c
+<span class="k">End Function</span></code></pre>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128295;</span> Font Size Audit</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>Reports every font size found across the deck, with instance count. Perfect for catching inconsistencies before client delivery.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that audits all font sizes across the active PowerPoint. Use a Scripting.Dictionary to count instances of each size. Report results sorted by size, showing "12pt: 45 instances" etc. Also flag any font size under 8pt as "too small for projection".</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128260;</span> Deep Find &amp; Replace (Everything)</h4>
+      <span class="tag tag-essential">Essential</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>PP's built-in find/replace misses tables, notes, and groups. This hits everything.</p>
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that does deep find & replace across the ENTIRE active PowerPoint including:
+- All shapes (text boxes, titles, subtitles)
+- Table cells
+- Grouped shapes (recursive)
+- Speaker notes
+Parameters: findText and replaceText as Strings. Report total replacements made and which slides were affected.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128200;</span> Extract All Text to TXT File</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that exports ALL text from every slide to a .txt file saved next to the presentation. Format: "=== SLIDE 1 ===" header, then each shape's text with its name like "[Title 1] Welcome to Q4 Review". Include speaker notes as "[Notes] ...". Perfect for content review.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128221;</span> Standardize Body Text Formatting</h4>
+      <span class="tag tag-agency">Agency</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that standardizes all body text (NOT titles) across all slides:
+- Font: Calibri 12pt, regular weight, color #333333
+- Line spacing: 1.3x
+- Paragraph spacing: 6pt before, 0pt after
+- Alignment: left
+Skip any shape whose name contains "Title". Skip tables and charts.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128288;</span> Fix Smart Quotes &amp; Special Characters</h4>
+      <span class="tag tag-new">New</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that cleans up special characters across all text in the active PowerPoint:
+- Replace curly quotes with straight quotes
+- Replace em-dashes with regular dashes
+- Replace non-breaking spaces with regular spaces
+- Replace double spaces with single spaces
+- Remove leading/trailing whitespace from each paragraph
+Report count of replacements per type.</div>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128221;</span> List All Fonts Used in Deck</h4>
+      <span class="tag tag-new">New</span>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="prompt">
+        <span class="prompt-label">Claude Code Prompt</span>
+        <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">Write a VBA macro that lists every unique font name used anywhere in the active PowerPoint (shapes, tables, groups, notes). Show each font with count of text runs using it, sorted by count descending. This helps catch rogue fonts before client delivery.</div>
+      </div>
+    </div></div></div>
+  </div>
+</div>
+
+<!-- Remaining sections follow the same pattern — using prompts for space efficiency -->
+
+<!-- ═══════════════ SHAPES & LAYOUT ═══════════════ -->
+<div class="sec" id="shapes">
+  <div class="sec-label">Macro Library</div>
+  <h2>Shapes &amp; <em>Layout</em></h2>
+  <p class="sec-intro">Align, distribute, resize, position, and bulk-edit shapes. The bread and butter of corporate presentation production.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128207;</span> Arrange Selected Shapes as Grid</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that takes all currently selected shapes in PowerPoint and arranges them in an evenly-spaced grid. Parameters: number of columns (Long) and spacing in points (Single). Center the grid on the slide (960x540). Use the first shape's dimensions as reference size.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128208;</span> Match All Shapes to First Shape's Size</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro: select 2+ shapes, run macro, all shapes resize to match the first shape's width and height. Report how many were resized.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Snap All Shapes to Pixel Grid</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that rounds the Left, Top, Width, and Height of every shape on every slide to whole numbers (no decimals). This fixes sub-pixel positioning that causes blurry edges. Report how many shapes were adjusted.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Distribute Shapes Evenly (H or V)</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that distributes selected shapes with even spacing. Parameter: direction ("H" for horizontal, "V" for vertical). Keep the first and last shape positions fixed, distribute the rest evenly between them.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128736;&#65039;</span> Set Consistent Margins on All Text Boxes</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that sets consistent internal margins on all text boxes across all slides: Left 7pt, Right 7pt, Top 4pt, Bottom 4pt. Also set AutoSize to ppAutoSizeNone and WordWrap to true. Skip placeholders.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127919;</span> Center Shape on Slide</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that centers the currently selected shape(s) both horizontally and vertically on the slide. Use ActivePresentation.PageSetup for slide dimensions.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128193;</span> Rename All Shapes Descriptively</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that renames all shapes on all slides with descriptive names based on type: "S1_TextBox_1", "S1_Image_1", "S1_Table_1", "S3_Chart_1". Prefix with slide number. This makes shapes easier to reference in other macros.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Remove All Shape Borders</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that removes borders (outlines) from all shapes across all slides. Set Line.Visible = msoFalse. Skip shapes that are lines or connectors. Report count.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ TABLES ═══════════════ -->
+<div class="sec" id="tables">
+  <div class="sec-label">Macro Library</div>
+  <h2><em>Tables</em></h2>
+  <p class="sec-intro">Style, format, and manipulate tables programmatically. Every corporate deck has them.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128203;</span> Style All Tables Consistently</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that applies consistent formatting to every table in the active PowerPoint:
+- Header row: background RGB(30,40,65), text white, bold, 10pt Calibri
+- Body rows: alternating white / RGB(245,245,245), text #333333, 9pt Calibri
+- All cell borders: thin, color #E0E0E0
+- Vertical alignment: center
+- Cell margins: 4pt all sides
+- Header row height: 32pt, body row height: 28pt</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Auto-Fit Table Column Widths</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that auto-fits column widths on all tables based on content length. Calculate the maximum text length in each column, then distribute the table's total width proportionally. Minimum column width: 50pt.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127912;</span> Highlight Cells by Value</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that highlights table cells based on their numeric content. For all tables: if a cell contains a number, color the cell green for positive, red for negative, gray for zero. Only colorize the cell background, not the text.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128194;</span> Merge Header Cells Across Columns</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that merges adjacent cells in the first row of a table if they contain the same text. This is useful for creating grouped column headers.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Extract Table to CSV</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that exports the first table found on the current slide to a CSV file. Save it next to the presentation with slide number in the filename. Handle commas in cell text by wrapping in quotes.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ COLORS & BRANDING ═══════════════ -->
+<div class="sec" id="brand">
+  <div class="sec-label">Macro Library</div>
+  <h2>Colors &amp; <em>Branding</em></h2>
+  <p class="sec-intro">Enforce brand colors, audit usage, and bulk-recolor elements.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127912;</span> Brand Color Audit</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that audits the active PowerPoint for off-brand colors. My approved brand palette:
+- Navy: RGB(30,40,65)
+- Blue: RGB(0,120,190)
+- White, Dark Gray #333, Medium Gray #808080, Black
+Check every shape fill and text color. Report each violation with slide number, shape name, and the wrong hex color. Show total violations vs total checked.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Bulk Recolor (Replace One Color with Another)</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that replaces one color with another across all shape fills AND line colors in the entire presentation. Parameters: oldR,oldG,oldB and newR,newG,newB as Long. Report count of fills and lines changed. Usage: RecolorShapes 255,0,0, 0,120,190</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Color Palette Extractor</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that extracts every unique color used in the active PowerPoint (fills, text, lines). Show each color as hex code with count of usage. Sort by frequency descending. This reverse-engineers the actual palette being used.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127752;</span> Apply Theme Colors to All Shapes</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that converts all hardcoded RGB colors to theme colors where possible. If a shape's fill matches a theme color (within RGB tolerance of 5), switch it to use the theme color reference instead. This makes the deck properly theme-aware for client rebranding.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ IMAGES & MEDIA ═══════════════ -->
+<div class="sec" id="images">
+  <div class="sec-label">Macro Library</div>
+  <h2>Images &amp; <em>Media</em></h2>
+  <p class="sec-intro">Batch insert, resize, compress, and manage images across slides.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128247;</span> Batch Insert Images from Folder</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that opens a folder picker, then inserts all JPG and PNG images from that folder into the active presentation — one image per new blank slide. Scale each to fit the slide at 90% (maintain aspect ratio), centered. Report count of images inserted.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Resize All Images to Consistent Width</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that resizes every image/picture on every slide to exactly 700pt wide, maintaining aspect ratio. Then center each horizontally. Skip images inside groups.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128736;&#65039;</span> Compress Images (Export/Reimport)</h4><span class="tag tag-advanced">Advanced</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that reduces file size by:
+1. Iterating through all images on all slides
+2. Exporting each to a temp folder as JPG at 150 DPI
+3. Recording position and size
+4. Deleting the original picture
+5. Re-inserting the compressed version at same position and size
+6. Cleaning up temp files
+7. Reporting file size impact</div></div><div class="callout warn"><span class="ci">&#9888;&#65039;</span><p>Destructive to image quality. Always compress on a copy, not the original.</p></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128194;</span> Replace Placeholder Images</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that finds all images on a specific slide and replaces them with images from a folder, matching by filename convention: "slide5_img1.jpg" replaces the first image on slide 5. Maintain the original position and size of each placeholder.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128247;</span> Add Alt Text to All Images</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that adds placeholder alt text to every image that doesn't have any. Set it to "Image on slide [N] - [shape name]". Also report images that already have alt text vs those that got new placeholder text. This is for accessibility compliance.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128736;&#65039;</span> Crop All Images to Same Aspect Ratio</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that crops all images on the current slide to a 16:9 aspect ratio using PictureFormat.Crop properties. Center the crop area. This ensures all images look consistent in a grid layout.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ CHARTS & DATA ═══════════════ -->
+<div class="sec" id="charts">
+  <div class="sec-label">Macro Library</div>
+  <h2>Charts &amp; <em>Data</em></h2>
+  <p class="sec-intro">Create, update, and style charts. Pull data from Excel.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128202;</span> Refresh All Linked Charts</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that finds all charts in the active PowerPoint, identifies which are linked to external Excel files, and refreshes their data. Report: charts refreshed, charts with broken links, charts using embedded data.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127912;</span> Apply Brand Styles to All Charts</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that styles every chart in the active PowerPoint:
+- Title: Calibri 14pt bold, color #1E2841
+- Axis labels: Calibri 10pt, color #808080
+- Legend: bottom, Calibri 10pt
+- Gridlines: thin, #E0E0E0
+- Plot area: white background
+- Series colors in order: #0078BE, #1E2841, #808080, #C8A450
+- Remove chart borders
+- Data labels: 9pt on bar/column charts only</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Convert Embedded Charts to Images</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that converts all charts to static images. For each chart: export as PNG to temp, delete the chart shape, insert the PNG at the same position/size. This prevents accidental data edits and reduces file size for client delivery.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ ANIMATION ═══════════════ -->
+<div class="sec" id="animation">
+  <div class="sec-label">Macro Library</div>
+  <h2><em>Animation</em> &amp; Transitions</h2>
+  <p class="sec-intro">Apply, remove, and standardize animations and transitions.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127916;</span> Remove All Animations</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that strips every animation from every slide. Delete all items from each slide's TimeLine.MainSequence. Report total animations removed.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128260;</span> Apply Uniform Fade Transition</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that applies a clean Fade transition to every slide: duration 0.5s, advance on click only (no auto-advance). Remove any existing transitions first.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Add Fade-In Animation to All Body Text</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that adds a subtle Fade entrance animation to every non-title text shape on every slide. Set: effect ppEffectFade, duration 0.3s, trigger WithPrevious with 0.1s delay between shapes. Skip titles, images, and charts.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ MASTERS & TEMPLATES ═══════════════ -->
+<div class="sec" id="masters">
+  <div class="sec-label">Macro Library</div>
+  <h2>Masters &amp; <em>Templates</em></h2>
+  <p class="sec-intro">Manipulate slide masters, custom layouts, and template-level settings.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128209;</span> List All Master Layouts</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that lists every custom layout in the slide master, showing: index number, layout name, shape count. This is essential for knowing layout names when writing other macros.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Apply Layout to Slide Range</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro: parameters layoutName (String), startSlide (Long), endSlide (Long). Apply that layout to slides in the range. If layout doesn't exist, list all available layouts and exit.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128736;&#65039;</span> Update Footer on Slide Master</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that updates the footer text on the slide master and all custom layouts. Parameters: footerText (String), fontName (String), fontSize (Single). Also update the copyright year to the current year automatically.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128194;</span> Delete Unused Layouts</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that identifies and deletes custom layouts that are not used by any slide. This reduces file bloat. Report which layouts were removed and which were kept.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ SPEAKER NOTES ═══════════════ -->
+<div class="sec" id="notes">
+  <div class="sec-label">Macro Library</div>
+  <h2>Speaker <em>Notes</em></h2>
+  <p class="sec-intro">Manage, export, and clean up speaker notes.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128221;</span> Export All Notes to Word/TXT</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that exports all speaker notes to a text file. Format: "Slide 1: [title]\n[notes text]\n---" for each slide. Skip slides with no notes. Save next to the presentation.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128465;&#65039;</span> Clear All Speaker Notes</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that removes ALL speaker notes from every slide. Report how many slides had notes cleared. Important for client delivery — never send internal notes to the client.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128203;</span> Import Notes from Text File</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that imports speaker notes from a text file. Format in file: "1: This is the note for slide 1" (one line per slide, slide number prefix). Match each line to the corresponding slide number.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ EXPORT & DELIVERY ═══════════════ -->
+<div class="sec" id="export">
+  <div class="sec-label">Macro Library</div>
+  <h2>Export &amp; <em>Delivery</em></h2>
+  <p class="sec-intro">PDF export, image export, packaging for client delivery.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128196;</span> Export to PDF (High Quality)</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that exports the active presentation as PDF. Use ExportAsFixedFormat with print intent (high quality). Don't include hidden slides. Save next to the .pptm with same name but .pdf extension. Open the PDF after saving.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128247;</span> Export Slides as High-Res PNGs</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that exports all slides as PNG images at 1920x1080 resolution into a subfolder called "slide_export". Create the folder if it doesn't exist.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128230;</span> Client Delivery Package</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that creates a client delivery package:
+1. Save a COPY as .pptx (no macros) in a "Delivery" subfolder
+2. Export as PDF
+3. Export slide 1 as thumbnail PNG (1920x1080)
+4. Name all files: ClientName_DeckTitle_YYYY-MM-DD
+5. clientName and deckTitle are parameters
+6. Show message with delivery folder path</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128221;</span> Strip Macros and Save as PPTX</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that saves a clean copy of the current .pptm as .pptx (stripping all VBA code). Append "_clean" to the filename. Keep the original .pptm open and unchanged.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ BATCH PROCESSING ═══════════════ -->
+<div class="sec" id="batch">
+  <div class="sec-label">Macro Library</div>
+  <h2>Batch <em>Processing</em></h2>
+  <p class="sec-intro">Process multiple .pptx files at once. The agency power move.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128194;</span> Process All PPTXs in Folder</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p>Template for any batch operation. Opens every .pptx in a folder, runs your code, saves, closes.</p><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that opens every .pptx file in a user-selected folder, runs a specific operation on each (leave a placeholder comment for the operation), saves, and closes. Use the folder picker dialog. Open files read-write, no window. Report count of files processed. Include error handling that logs failures per file but continues with the rest.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Batch Font Replace Across All Files</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that replaces font "Arial" with "Calibri" in EVERY .pptx file in a selected folder. Open each file, run global font replacement (including tables and groups), save, close. Report per-file counts and total.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128200;</span> Batch Export All Decks as PDF</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that converts every .pptx file in a selected folder to PDF. Save each PDF next to its source file with same name. Report count processed.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ CLEANUP & QA ═══════════════ -->
+<div class="sec" id="cleanup">
+  <div class="sec-label">Macro Library</div>
+  <h2>Cleanup &amp; <em>QA</em></h2>
+  <p class="sec-intro">The macros you run before every client delivery. Quality gate essentials.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128465;&#65039;</span> Remove Red Review Comments</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that finds all red text (#FF0000 or nearby reds with R>200, G<80, B<80) across the entire presentation — these are internal review comments — and deletes those text runs. Report count removed per slide.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128270;</span> Find Placeholder Text ("TBD", "INSERT", "DRAFT")</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that searches all text in the active PowerPoint for placeholder strings: "TBD", "TODO", "INSERT", "PLACEHOLDER", "DRAFT", "XXX", "[FILL]". Report each find with slide number and shape name. Don't delete — just audit and report.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128295;</span> Fix Overlapping Shapes</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that detects shapes that extend beyond the slide boundaries (Left < 0 or Top < 0 or Left+Width > 960 or Top+Height > 540). Report each offending shape with slide number and current position. This catches elements accidentally dragged off-slide.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128203;</span> Accessibility Check</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that runs an accessibility audit:
+- Images without alt text
+- Text smaller than 18pt (may be hard to read when projected)
+- Low contrast text (light text on light backgrounds or dark on dark)
+- Slides without titles
+- Tables without header rows marked
+Report issues grouped by slide.</div></div></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128202;</span> Pre-Delivery QA Checklist Runner</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><div class="prompt"><span class="prompt-label">Claude Code Prompt</span><button class="prompt-cp" onclick="cpPrompt(this)">Copy</button><div class="prompt-text">Write a VBA macro that runs a comprehensive QA check and generates a report:
+1. Font audit: list all fonts used (flag non-brand fonts)
+2. Color audit: list off-brand colors
+3. Placeholder search: find TBD/TODO/INSERT
+4. Notes check: any slides with speaker notes?
+5. Off-slide shapes: anything beyond slide boundaries?
+6. Empty slides: any with no content?
+7. Image count: total images and any without alt text
+8. File size estimate
+Generate the report as a new slide at the end, or as a MsgBox.</div></div></div></div></div></div>
+</div>
+
+<!-- ═══════════════ OBJECT MODEL ═══════════════ -->
+<div class="sec" id="objmodel">
+  <div class="sec-label">Reference</div>
+  <h2>Object Model <em>Cheat Sheet</em></h2>
+  <p class="sec-intro">The essential properties and methods for 90% of your macros.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Object</th><th>Access</th><th>Key Properties</th></tr></thead>
+      <tbody>
+        <tr><td><code>Presentation</code></td><td><code>ActivePresentation</code></td><td><code>.Slides</code> <code>.SlideMaster</code> <code>.PageSetup</code> <code>.FullName</code></td></tr>
+        <tr><td><code>Slide</code></td><td><code>.Slides(n)</code></td><td><code>.Shapes</code> <code>.SlideIndex</code> <code>.CustomLayout</code> <code>.NotesPage</code></td></tr>
+        <tr><td><code>Shape</code></td><td><code>.Shapes(n)</code></td><td><code>.Type</code> <code>.Left/.Top/.Width/.Height</code> <code>.Name</code> <code>.HasTextFrame</code></td></tr>
+        <tr><td><code>TextFrame</code></td><td><code>shp.TextFrame</code></td><td><code>.TextRange</code> <code>.HasText</code> <code>.AutoSize</code> <code>.MarginLeft/Right/Top/Bottom</code></td></tr>
+        <tr><td><code>TextRange</code></td><td><code>.TextFrame.TextRange</code></td><td><code>.Text</code> <code>.Font</code> <code>.Runs</code> <code>.Paragraphs</code> <code>.Replace</code></td></tr>
+        <tr><td><code>Font</code></td><td><code>.Font</code></td><td><code>.Name</code> <code>.Size</code> <code>.Bold</code> <code>.Italic</code> <code>.Color.RGB</code></td></tr>
+        <tr><td><code>Fill</code></td><td><code>shp.Fill</code></td><td><code>.ForeColor.RGB</code> <code>.Type</code> <code>.Solid</code> <code>.Visible</code></td></tr>
+        <tr><td><code>Table</code></td><td><code>shp.Table</code></td><td><code>.Rows</code> <code>.Columns</code> <code>.Cell(r,c)</code></td></tr>
+        <tr><td><code>Chart</code></td><td><code>shp.Chart</code></td><td><code>.ChartType</code> <code>.SeriesCollection</code> <code>.ChartTitle</code> <code>.Refresh</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Shape Type</th><th>Constant</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Auto shape</td><td><code>msoAutoShape</code></td><td>1</td></tr>
+        <tr><td>Picture</td><td><code>msoPicture</code></td><td>13</td></tr>
+        <tr><td>Placeholder</td><td><code>msoPlaceholder</code></td><td>14</td></tr>
+        <tr><td>Text box</td><td><code>msoTextBox</code></td><td>17</td></tr>
+        <tr><td>Group</td><td><code>msoGroup</code></td><td>6</td></tr>
+        <tr><td>Table</td><td><code>msoTable</code></td><td>19</td></tr>
+        <tr><td>Chart</td><td><code>msoChart</code></td><td>3</td></tr>
+        <tr><td>Freeform</td><td><code>msoFreeform</code></td><td>5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Format</th><th>Width (pt)</th><th>Height (pt)</th></tr></thead>
+      <tbody>
+        <tr><td>Standard 4:3</td><td>720</td><td>540</td></tr>
+        <tr><td><strong>Widescreen 16:9</strong></td><td><strong>960</strong></td><td><strong>540</strong></td></tr>
+        <tr><td>Widescreen 16:10</td><td>720</td><td>450</td></tr>
+        <tr><td>A4 Portrait</td><td>595</td><td>842</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.78rem;color:var(--ink-muted);margin-top:8px">1 inch = 72 points. Most corporate decks use 16:9 (960 &times; 540).</p>
+</div>
+
+<!-- ═══════════════ PROMPT COOKBOOK ═══════════════ -->
+<div class="sec" id="cookbook">
+  <div class="sec-label">Reference</div>
+  <h2>Prompt <em>Cookbook</em></h2>
+  <p class="sec-intro">Copy-paste prompts engineered for best macro output from Claude Code.</p>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Session Starter</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">You are a PowerPoint VBA expert for a creative agency. We make corporate presentations for enterprise clients. Write production-ready VBA macros with On Error GoTo error handling, meaningful variables, comments, MsgBox summaries, support for tables/groups/nested shapes. Target: 16:9 widescreen, PowerPoint 2019+ / Microsoft 365.</div>
+  </div>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Quick: Standardize Body Text</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">Write a VBA macro that makes all non-title body text across all slides use Calibri 12pt, regular weight, color #333333, 1.2x line spacing.</div>
+  </div>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Quick: Clear Notes</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">Write a VBA macro that removes all speaker notes from every slide. Report count cleared.</div>
+  </div>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Quick: Add Footer</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">Write a VBA macro that adds footer "Confidential — Acme Corp — 2026" to all slides. Position bottom-center, 8pt Calibri, #808080. Name the shape "CustomFooter" so re-running removes old ones first.</div>
+  </div>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Quick: Remove Internal Comments</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">Write a VBA macro that finds all red text (R>200, G<80, B<80) in the presentation — these are internal review comments — and deletes them. Report how many per slide.</div>
+  </div>
+
+  <div class="prompt" style="margin-bottom:16px">
+    <span class="prompt-label">Debugging</span>
+    <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+    <div class="prompt-text">This VBA macro throws an error. Here's the code and error:
+
+[PASTE CODE]
+
+Error: [PASTE ERROR]
+
+The macro should [DESCRIBE GOAL]. The deck has [DESCRIBE STRUCTURE].
+
+Fix and explain what went wrong.</div>
+  </div>
+</div>
+
+<!-- ═══════════════ TROUBLESHOOTING ═══════════════ -->
+<div class="sec" id="errors">
+  <div class="sec-label">Reference</div>
+  <h2><em>Troubleshooting</em></h2>
+  <p class="sec-intro">Common VBA errors and how to fix them.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> Runtime Error 91: Object variable not set</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> Accessing a shape/slide that doesn't exist.</p><p><strong>Fix:</strong> Check with <code>If Not shp Is Nothing Then</code> or verify <code>.Count</code> before indexing.</p></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> "The specified value is out of range"</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> Invalid index after deletion mid-loop.</p><p><strong>Fix:</strong> Loop backwards: <code>For i = .Count To 1 Step -1</code></p></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> "Method or data member not found"</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> Accessing <code>.TextFrame</code> on a shape without one (like a picture).</p><p><strong>Fix:</strong> Always check <code>If shp.HasTextFrame Then</code> first.</p></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> Macros disappear after saving as .pptx</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> <code>.pptx</code> strips all VBA code.</p><p><strong>Fix:</strong> Save As &rarr; <code>.pptm</code> (Macro-Enabled Presentation).</p></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> Macro skips shapes inside groups</h4><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> <code>Slide.Shapes</code> doesn't include items inside groups.</p><p><strong>Fix:</strong> Check <code>shp.Type = msoGroup</code> and recurse through <code>shp.GroupItems</code>.</p></div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#128680;</span> "Automation Error" on Save</h4><span class="tag tag-new">New</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content"><p><strong>Cause:</strong> File locked by another process (OneDrive sync, antivirus).</p><p><strong>Fix:</strong> Pause OneDrive sync, save to a local folder, or try <code>SaveCopyAs</code> instead of <code>Save</code>.</p></div></div></div></div>
+
+  <div class="callout tip">
+    <span class="ci">&#128161;</span>
+    <p><strong>Debugging tip:</strong> Use <kbd>Ctrl</kbd>+<kbd>G</kbd> in VBE for the Immediate Window. Type <code>? ActivePresentation.Slides(1).Shapes.Count</code> to test expressions live without running a full macro.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ WORKFLOWS ═══════════════ -->
+<div class="sec" id="workflows">
+  <div class="sec-label">Reference</div>
+  <h2>End-to-End <em>Workflows</em></h2>
+  <p class="sec-intro">Complete recipes that combine multiple macros for real agency scenarios.</p>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127942;</span> New Client Deck Setup</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content">
+    <div class="flow">
+      <div class="flow-step" data-n="1"><h4>Create from .potm template</h4><p>Save as ClientName_Project.pptm</p></div>
+      <div class="flow-step" data-n="2"><h4>Run: InsertSectionDividers</h4><p>Add branded section slides from the client's agenda</p></div>
+      <div class="flow-step" data-n="3"><h4>Run: GlobalFontReplace</h4><p>Swap template fonts for client brand fonts</p></div>
+      <div class="flow-step" data-n="4"><h4>Run: RecolorShapes</h4><p>Swap agency colors for client brand palette</p></div>
+      <div class="flow-step" data-n="5"><h4>Run: AddCustomSlideNumbers</h4><p>Add formatted page numbers</p></div>
+      <div class="flow-step" data-n="6"><h4>Run: UpdateFooter</h4><p>Set confidentiality notice and year</p></div>
+    </div>
+  </div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127942;</span> Pre-Client QA Checklist</h4><span class="tag tag-essential">Essential</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content">
+    <div class="flow">
+      <div class="flow-step" data-n="1"><h4>Run: BrandColorAudit</h4><p>Fix off-brand colors</p></div>
+      <div class="flow-step" data-n="2"><h4>Run: AuditFontSizes</h4><p>Standardize typography</p></div>
+      <div class="flow-step" data-n="3"><h4>Run: FindPlaceholders</h4><p>Catch any TBD/TODO text</p></div>
+      <div class="flow-step" data-n="4"><h4>Run: RemoveRedComments</h4><p>Strip internal review notes</p></div>
+      <div class="flow-step" data-n="5"><h4>Run: ClearSpeakerNotes</h4><p>Remove internal notes</p></div>
+      <div class="flow-step" data-n="6"><h4>Run: ClientDeliveryPackage</h4><p>Export .pptx + PDF + thumbnail</p></div>
+    </div>
+  </div></div></div></div>
+
+  <div class="macro"><div class="macro-head" onclick="tog(this)"><h4><span class="mi">&#127942;</span> Quarterly Report Update</h4><span class="tag tag-agency">Agency</span><svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="macro-body"><div class="macro-inner"><div class="macro-content">
+    <div class="prompt">
+      <span class="prompt-label">Claude Code Prompt</span>
+      <button class="prompt-cp" onclick="cpPrompt(this)">Copy</button>
+      <div class="prompt-text">Write a single VBA macro that preps a quarterly report deck:
+1. Find-replace "Q3 2025" with "Q4 2025" everywhere
+2. Find-replace "July-September" with "October-December"
+3. Refresh all linked chart data
+4. Update footer date to today
+5. Update slide numbers
+6. Save as new file with new quarter in filename
+One macro, one click, quarter updated.</div>
+    </div>
+  </div></div></div></div>
+</div>
+
+<!-- ═══════════════ KEYBOARD REFERENCE ═══════════════ -->
+<div class="sec" id="keyboard">
+  <div class="sec-label">Reference</div>
+  <h2>Keyboard <em>Reference</em></h2>
+  <p class="sec-intro">Essential shortcuts for VBE and PowerPoint.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Action</th><th>Shortcut</th><th>Context</th></tr></thead>
+      <tbody>
+        <tr><td>Open VBA Editor</td><td><kbd>Alt</kbd>+<kbd>F11</kbd></td><td>PowerPoint</td></tr>
+        <tr><td>Run macro</td><td><kbd>F5</kbd></td><td>VBE</td></tr>
+        <tr><td>Step through code</td><td><kbd>F8</kbd></td><td>VBE</td></tr>
+        <tr><td>Toggle breakpoint</td><td><kbd>F9</kbd></td><td>VBE</td></tr>
+        <tr><td>Immediate Window</td><td><kbd>Ctrl</kbd>+<kbd>G</kbd></td><td>VBE</td></tr>
+        <tr><td>Object Browser</td><td><kbd>F2</kbd></td><td>VBE</td></tr>
+        <tr><td>IntelliSense</td><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>VBE</td></tr>
+        <tr><td>Comment block</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td><td>VBE (custom)</td></tr>
+        <tr><td>Stop macro</td><td><kbd>Ctrl</kbd>+<kbd>Break</kbd></td><td>VBE</td></tr>
+        <tr><td>Reset VBA state</td><td>Run &rarr; Reset</td><td>VBE menu</td></tr>
+        <tr><td>Save as macro-enabled</td><td><kbd>F12</kbd> &rarr; change type</td><td>PowerPoint</td></tr>
+        <tr><td>Quick macro dialog</td><td><kbd>Alt</kbd>+<kbd>F8</kbd></td><td>PowerPoint</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /content -->
+</main>
+
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+function go(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  const nav=document.querySelector(`.sb-item[data-to="${id}"]`);
+  if(nav)nav.classList.add('active');
+  if(window.innerWidth<=768){
+    document.getElementById('sidebar').classList.remove('open');
+    document.querySelector('.sb-overlay').classList.remove('vis');
+  }
+}
+
+const secs=document.querySelectorAll('.sec');
+const navs=document.querySelectorAll('.sb-item[data-to]');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navs.forEach(n=>n.classList.remove('active'));
+      const t=e.target.id;
+      const nav=document.querySelector(`.sb-item[data-to="${t}"]`);
+      if(nav)nav.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s=>obs.observe(s));
+
+function tog(head){head.parentElement.classList.toggle('open')}
+
+function cpCode(btn){
+  const code=btn.closest('.code-wrap').querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},2e3);
+  });
+}
+
+function cpPrompt(btn){
+  const text=btn.closest('.prompt').querySelector('.prompt-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},2e3);
+  });
+}
+
+function doSearch(q){
+  q=q.toLowerCase().trim();
+  if(!q){
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('hidden'));
+    document.querySelectorAll('.macro').forEach(m=>m.classList.remove('hidden'));
+    return;
+  }
+  document.querySelectorAll('.sec').forEach(sec=>{
+    let hit=false;
+    const h2=sec.querySelector('h2');
+    if(h2&&h2.textContent.toLowerCase().includes(q))hit=true;
+    sec.querySelectorAll('.macro').forEach(m=>{
+      if(m.textContent.toLowerCase().includes(q)){m.classList.remove('hidden');hit=true;m.classList.add('open')}
+      else m.classList.add('hidden');
+    });
+    sec.querySelectorAll('.prompt').forEach(p=>{
+      if(p.textContent.toLowerCase().includes(q))hit=true;
+    });
+    sec.classList.toggle('hidden',!hit);
+  });
+}
+
+function toggleSB(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.sb-overlay').classList.toggle('vis');
+}
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('btt').classList.toggle('vis',window.scrollY>400);
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('search').focus()}
+  if(e.key==='Escape'){document.getElementById('search').blur();document.getElementById('search').value='';doSearch('')}
+});
+</script>
+
+</body>
+</html>
