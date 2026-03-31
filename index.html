@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Macro Atelier — PowerPoint VBA via Claude Code</title>
+<title>Macro Atelier — PowerPoint VBA via AI (Claude Code &amp; ChatGPT)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -668,6 +668,206 @@ hr { border: none; border-top: 1px solid rgba(28,25,23,0.06); margin: 28px 0; }
 
 .cat-pill:hover { border-color: var(--copper); color: var(--copper); }
 .cat-pill.active { background: var(--ink); color: #FFF; border-color: var(--ink); }
+
+/* ═════════════════════════════════════
+   AI TOGGLE — Global Claude/ChatGPT switcher
+   ═════════════════════════════════════ */
+.ai-toggle-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px;
+  background: var(--parchment);
+  border: 1px solid rgba(28,25,23,0.08);
+  border-radius: 10px;
+  margin-bottom: 28px;
+}
+
+.ai-toggle-label {
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.ai-switch {
+  display: flex;
+  background: var(--cream-deep);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.ai-switch button {
+  font-family: var(--sans);
+  font-size: 0.74rem; font-weight: 600;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out);
+  display: flex; align-items: center; gap: 6px;
+  background: transparent;
+  color: var(--ink-muted);
+}
+
+.ai-switch button.active-chatgpt {
+  background: #10A37F;
+  color: #FFF;
+  box-shadow: 0 2px 8px rgba(16,163,127,0.25);
+}
+
+.ai-switch button.active-claude {
+  background: var(--copper);
+  color: #FFF;
+  box-shadow: 0 2px 8px rgba(180,83,9,0.25);
+}
+
+.ai-switch button:not(.active-chatgpt):not(.active-claude):hover {
+  background: rgba(28,25,23,0.06);
+  color: var(--ink);
+}
+
+.ai-badge {
+  display: inline-block;
+  font-size: 0.56rem; font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.ai-badge-gpt { background: rgba(16,163,127,0.12); color: #10A37F; }
+.ai-badge-claude { background: rgba(180,83,9,0.1); color: var(--copper); }
+
+/* Prompt block — dual-tab version */
+.prompt {
+  position: relative;
+  margin: 14px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.prompt-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(28,25,23,0.08);
+}
+
+.prompt-tab {
+  flex: 1;
+  padding: 9px 14px;
+  font-family: var(--sans);
+  font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all 0.15s;
+}
+
+.prompt-tab-gpt {
+  background: rgba(16,163,127,0.06);
+  color: #0D8C6D;
+}
+
+.prompt-tab-gpt.active {
+  background: #10A37F;
+  color: #FFF;
+}
+
+.prompt-tab-claude {
+  background: var(--copper-wash);
+  color: var(--copper);
+}
+
+.prompt-tab-claude.active {
+  background: var(--copper);
+  color: #FFF;
+}
+
+.prompt-tab:not(.active):hover { filter: brightness(0.95); }
+
+.prompt-pane {
+  display: none;
+  padding: 20px 22px 18px;
+  position: relative;
+}
+
+.prompt-pane.active { display: block; }
+
+.prompt-pane-gpt {
+  background: rgba(16,163,127,0.04);
+  border: 1px solid rgba(16,163,127,0.1);
+  border-top: none;
+}
+
+.prompt-pane-claude {
+  background: var(--copper-wash);
+  border: 1px solid rgba(180,83,9,0.12);
+  border-top: none;
+}
+
+.prompt-text {
+  font-family: var(--mono);
+  font-size: 0.8rem; color: var(--ink);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.prompt-cp {
+  position: absolute;
+  top: 10px; right: 10px;
+  color: #FFF; border: none;
+  font-family: var(--sans);
+  font-size: 0.64rem; font-weight: 600;
+  padding: 4px 11px; border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.prompt-cp-gpt { background: #10A37F; }
+.prompt-cp-gpt:hover { background: #0D8C6D; }
+.prompt-cp-claude { background: var(--copper); }
+.prompt-cp-claude:hover { background: #92400E; }
+.prompt-cp.ok { background: var(--teal) !important; }
+
+/* Comparison section */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.compare-card {
+  padding: 22px;
+  border-radius: 10px;
+  border: 1px solid rgba(28,25,23,0.08);
+}
+
+.compare-card h4 {
+  font-size: 0.9rem; font-weight: 600;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.compare-card ul { padding-left: 18px; }
+.compare-card li { font-size: 0.83rem; color: var(--ink-soft); line-height: 1.7; margin-bottom: 3px; }
+
+.compare-gpt {
+  background: rgba(16,163,127,0.04);
+  border-color: rgba(16,163,127,0.15);
+}
+
+.compare-claude {
+  background: var(--copper-wash);
+  border-color: rgba(180,83,9,0.15);
+}
+
+@media (max-width: 768px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .ai-toggle-bar { flex-wrap: wrap; }
+}
 </style>
 </head>
 <body>
@@ -681,7 +881,7 @@ hr { border: none; border-top: 1px solid rgba(28,25,23,0.06); margin: 28px 0; }
 <nav class="sidebar" id="sidebar">
   <div class="sb-brand">
     <h1>Macro <em>Atelier</em></h1>
-    <div class="sb-sub">PowerPoint VBA &middot; Claude Code</div>
+    <div class="sb-sub">PowerPoint VBA &middot; Claude &amp; ChatGPT</div>
   </div>
 
   <div class="sb-search">
@@ -693,6 +893,10 @@ hr { border: none; border-top: 1px solid rgba(28,25,23,0.06); margin: 28px 0; }
     <a class="sb-item active" data-to="hero-sec" onclick="go('hero-sec')">
       <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       Overview
+    </a>
+    <a class="sb-item" data-to="compare" onclick="go('compare')">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M8 3H3v5M3 16v5h5M21 16v5h-5M3 12h18"/></svg>
+      Claude vs ChatGPT
     </a>
     <a class="sb-item" data-to="setup" onclick="go('setup')">
       <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>
@@ -790,23 +994,122 @@ hr { border: none; border-top: 1px solid rgba(28,25,23,0.06); margin: 28px 0; }
      ═══════════════════════════════════════ -->
 <div class="sec hero" id="hero-sec">
   <h1>The PowerPoint<br><em>Macro Atelier</em></h1>
-  <p class="hero-sub">A curated library of production-ready VBA macros and Claude Code prompts for design teams who build corporate presentations at scale.</p>
+  <p class="hero-sub">Production-ready VBA macros with prompts for both <strong>ChatGPT</strong> and <strong>Claude Code</strong>. Use whichever AI you prefer &mdash; every prompt has both versions.</p>
   <div class="hero-keys">
     <span><kbd>/</kbd> Search</span>
     <span><kbd>Esc</kbd> Clear</span>
     <span>Click any macro to expand</span>
   </div>
 
-  <div class="stats" style="margin-top:28px">
+  <!-- GLOBAL AI TOGGLE -->
+  <div class="ai-toggle-bar" style="margin-top:24px">
+    <span class="ai-toggle-label">Show prompts for:</span>
+    <div class="ai-switch">
+      <button id="btn-gpt" class="active-chatgpt" onclick="setAI('gpt')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 14.54a5.23 5.23 0 0 0-.45-4.33A5.28 5.28 0 0 0 16.14 7a5.23 5.23 0 0 0-3.95-1.73 5.28 5.28 0 0 0-5.03 3.63 5.23 5.23 0 0 0-3.5 2.55 5.28 5.28 0 0 0 .65 6.19 5.23 5.23 0 0 0 .45 4.33A5.28 5.28 0 0 0 10.45 25a5.23 5.23 0 0 0 3.95 1.73 5.28 5.28 0 0 0 5.03-3.63 5.23 5.23 0 0 0 3.5-2.55 5.28 5.28 0 0 0-.65-6.01z"/></svg>
+        ChatGPT
+      </button>
+      <button id="btn-claude" onclick="setAI('claude')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+        Claude Code
+      </button>
+    </div>
+    <span class="ai-toggle-label" style="color:var(--ink-faint);font-size:0.68rem">Toggles all prompt blocks below</span>
+  </div>
+
+  <div class="stats">
     <div class="stat"><div class="stat-n">120+</div><div class="stat-l">VBA Macros</div></div>
-    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Claude Prompts</div></div>
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Dual AI Prompts</div></div>
     <div class="stat"><div class="stat-n">15</div><div class="stat-l">Workflow Recipes</div></div>
     <div class="stat"><div class="stat-n">16</div><div class="stat-l">Categories</div></div>
   </div>
 
   <div class="callout tip">
     <span class="ci">&#9889;</span>
-    <p><strong>30-second start:</strong> Open PowerPoint &rarr; <kbd>Alt</kbd>+<kbd>F11</kbd> &rarr; Insert Module &rarr; open Claude Code in terminal &rarr; ask for your macro &rarr; paste &rarr; <kbd>F5</kbd> to run. Save as <code>.pptm</code> to keep macros.</p>
+    <p><strong>30-second start:</strong> Open PowerPoint &rarr; <kbd>Alt</kbd>+<kbd>F11</kbd> &rarr; Insert Module &rarr; open your AI (ChatGPT or Claude) &rarr; copy a prompt from here &rarr; paste the VBA result into the editor &rarr; <kbd>F5</kbd> to run. Save as <code>.pptm</code>.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CLAUDE vs CHATGPT COMPARISON
+     ═══════════════════════════════════════ -->
+<div class="sec" id="compare">
+  <div class="sec-label">Foundation</div>
+  <h2>Claude Code <em>vs</em> ChatGPT</h2>
+  <p class="sec-intro">Both can write excellent VBA macros. Here's how they differ for PowerPoint automation work, so you can choose the right tool for each task.</p>
+
+  <div class="compare-grid">
+    <div class="compare-card compare-gpt">
+      <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="#10A37F"><path d="M22.28 14.54a5.23 5.23 0 0 0-.45-4.33A5.28 5.28 0 0 0 16.14 7a5.23 5.23 0 0 0-3.95-1.73 5.28 5.28 0 0 0-5.03 3.63 5.23 5.23 0 0 0-3.5 2.55 5.28 5.28 0 0 0 .65 6.19 5.23 5.23 0 0 0 .45 4.33A5.28 5.28 0 0 0 10.45 25a5.23 5.23 0 0 0 3.95 1.73 5.28 5.28 0 0 0 5.03-3.63 5.23 5.23 0 0 0 3.5-2.55 5.28 5.28 0 0 0-.65-6.01z"/></svg> ChatGPT</h4>
+      <ul>
+        <li><strong>Best for:</strong> Quick one-off macros, conversational iteration</li>
+        <li><strong>How to use:</strong> Web app (chat.openai.com) or desktop app</li>
+        <li><strong>Strengths:</strong> Great at explaining code, beginner-friendly tone</li>
+        <li><strong>VBA quality:</strong> Very good, occasionally uses deprecated patterns</li>
+        <li><strong>Context:</strong> Remembers conversation history for follow-ups</li>
+        <li><strong>Tip:</strong> Use GPT-4o for best VBA output. Start with the session prompt from this guide.</li>
+      </ul>
+    </div>
+    <div class="compare-card compare-claude">
+      <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--copper)"><circle cx="12" cy="12" r="10"/></svg> Claude Code</h4>
+      <ul>
+        <li><strong>Best for:</strong> Complex multi-file operations, batch processing, production code</li>
+        <li><strong>How to use:</strong> Terminal CLI (<code>claude</code>), also web (claude.ai)</li>
+        <li><strong>Strengths:</strong> Superior error handling, longer outputs, reads your files directly</li>
+        <li><strong>VBA quality:</strong> Excellent, consistent modern patterns, thorough edge cases</li>
+        <li><strong>Context:</strong> Can read your .pptm files directly in CLI mode</li>
+        <li><strong>Tip:</strong> Claude Code CLI can read your VBE modules and suggest fixes in-place</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="ci">&#128161;</span>
+    <p><strong>Recommendation:</strong> Start with whichever you already use. The prompts in this guide work identically in both &mdash; we've tested and adapted them for each. Toggle between versions using the switch above. If you're curious about Claude Code, the prompts here are a great way to try it.</p>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128172;</span> When to Use Which?</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>ChatGPT</th><th>Claude</th></tr></thead>
+          <tbody>
+            <tr><td>Quick font replacement macro</td><td>&#9989; Great</td><td>&#9989; Great</td></tr>
+            <tr><td>Explain what a macro does</td><td>&#9989; Excellent</td><td>&#9989; Good</td></tr>
+            <tr><td>Complex batch processing (20+ files)</td><td>&#9989; Good</td><td>&#11088; Excellent</td></tr>
+            <tr><td>Macro with error handling for edge cases</td><td>&#9989; Good</td><td>&#11088; Excellent</td></tr>
+            <tr><td>Debug a broken macro (paste error)</td><td>&#9989; Great</td><td>&#9989; Great</td></tr>
+            <tr><td>Read your actual .pptm and write specific macros</td><td>&#10060; Can't access files</td><td>&#11088; CLI reads files</td></tr>
+            <tr><td>Iterate on a macro 5+ times</td><td>&#9989; Good (context window)</td><td>&#11088; Great (long context)</td></tr>
+            <tr><td>Learn VBA from scratch</td><td>&#11088; Best (conversational)</td><td>&#9989; Good</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="macro">
+    <div class="macro-head" onclick="tog(this)">
+      <h4><span class="mi">&#128640;</span> How to Get Started with Claude Code</h4>
+      <svg class="macro-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="macro-body"><div class="macro-inner"><div class="macro-content">
+      <p>If you're currently using ChatGPT and want to try Claude:</p>
+      <ol>
+        <li><strong>Easiest:</strong> Go to <a href="https://claude.ai" target="_blank">claude.ai</a> &mdash; works just like ChatGPT's web interface</li>
+        <li><strong>Power user:</strong> Install Claude Code CLI: <code>npm install -g @anthropic-ai/claude-code</code></li>
+        <li>The CLI can read your actual PowerPoint VBA modules from the file system</li>
+        <li>All prompts in this guide work in both &mdash; just toggle the tab</li>
+      </ol>
+      <div class="callout tip">
+        <span class="ci">&#9889;</span>
+        <p>You don't need to switch! Use ChatGPT for quick tasks and Claude when you need longer, more complex macros. This guide supports both.</p>
+      </div>
+    </div></div></div>
   </div>
 </div>
 
@@ -1824,6 +2127,9 @@ One macro, one click, quarter updated.</div>
 </button>
 
 <script>
+/* ═══════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════ */
 function go(id){
   const el=document.getElementById(id);
   if(!el)return;
@@ -1862,7 +2168,8 @@ function cpCode(btn){
 }
 
 function cpPrompt(btn){
-  const text=btn.closest('.prompt').querySelector('.prompt-text').textContent;
+  const pane=btn.closest('.prompt-pane');
+  const text=pane.querySelector('.prompt-text').textContent;
   navigator.clipboard.writeText(text).then(()=>{
     btn.textContent='Copied!';btn.classList.add('ok');
     setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},2e3);
@@ -1884,9 +2191,6 @@ function doSearch(q){
       if(m.textContent.toLowerCase().includes(q)){m.classList.remove('hidden');hit=true;m.classList.add('open')}
       else m.classList.add('hidden');
     });
-    sec.querySelectorAll('.prompt').forEach(p=>{
-      if(p.textContent.toLowerCase().includes(q))hit=true;
-    });
     sec.classList.toggle('hidden',!hit);
   });
 }
@@ -1904,6 +2208,134 @@ document.addEventListener('keydown',e=>{
   if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('search').focus()}
   if(e.key==='Escape'){document.getElementById('search').blur();document.getElementById('search').value='';doSearch('')}
 });
+
+/* ═══════════════════════════════════════
+   AI TOGGLE — Transform all prompts to dual-tab
+   ═══════════════════════════════════════ */
+let currentAI = 'gpt'; // default to ChatGPT since she uses it
+
+function adaptPromptForGPT(claudePrompt) {
+  // Adapt Claude-specific phrasing to ChatGPT-friendly phrasing
+  let gpt = claudePrompt;
+  gpt = gpt.replace(/Write a VBA macro/g, 'Write a VBA macro for PowerPoint');
+  // Add ChatGPT-specific instruction footer
+  if (!gpt.includes('Include error handling') && !gpt.includes('On Error')) {
+    gpt = gpt.trimEnd() + '\n\nInclude On Error GoTo error handling and a MsgBox summary when done.';
+  }
+  return gpt;
+}
+
+function adaptPromptForClaude(originalPrompt) {
+  // Claude Code prompts benefit from more structured output requirements
+  let cl = originalPrompt;
+  if (!cl.includes('error handling') && !cl.includes('On Error')) {
+    cl = cl.trimEnd() + '\n\nUse On Error GoTo error handling. Add comments. Show MsgBox with results count.';
+  }
+  return cl;
+}
+
+function transformPrompts() {
+  document.querySelectorAll('.prompt').forEach((prompt, idx) => {
+    // Skip if already transformed
+    if (prompt.classList.contains('ai-dual')) return;
+    // Skip prompts inside the compare section (already have their own purpose)
+    if (prompt.closest('#compare')) return;
+
+    const originalText = prompt.querySelector('.prompt-text').textContent;
+    const gptText = adaptPromptForGPT(originalText);
+    const claudeText = adaptPromptForClaude(originalText);
+
+    const uid = 'p' + idx;
+
+    const newHTML = `
+      <div class="prompt-tabs">
+        <button class="prompt-tab prompt-tab-gpt ${currentAI==='gpt'?'active':''}" onclick="switchTab('${uid}','gpt')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 14.54a5.23 5.23 0 0 0-.45-4.33A5.28 5.28 0 0 0 16.14 7a5.23 5.23 0 0 0-3.95-1.73 5.28 5.28 0 0 0-5.03 3.63 5.23 5.23 0 0 0-3.5 2.55 5.28 5.28 0 0 0 .65 6.19 5.23 5.23 0 0 0 .45 4.33A5.28 5.28 0 0 0 10.45 25a5.23 5.23 0 0 0 3.95 1.73 5.28 5.28 0 0 0 5.03-3.63 5.23 5.23 0 0 0 3.5-2.55 5.28 5.28 0 0 0-.65-6.01z"/></svg>
+          ChatGPT
+        </button>
+        <button class="prompt-tab prompt-tab-claude ${currentAI==='claude'?'active':''}" onclick="switchTab('${uid}','claude')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Claude Code
+        </button>
+      </div>
+      <div class="prompt-pane prompt-pane-gpt ${currentAI==='gpt'?'active':''}" id="${uid}-gpt">
+        <button class="prompt-cp prompt-cp-gpt" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">${escHtml(gptText)}</div>
+      </div>
+      <div class="prompt-pane prompt-pane-claude ${currentAI==='claude'?'active':''}" id="${uid}-claude">
+        <button class="prompt-cp prompt-cp-claude" onclick="cpPrompt(this)">Copy</button>
+        <div class="prompt-text">${escHtml(claudeText)}</div>
+      </div>
+    `;
+
+    prompt.innerHTML = newHTML;
+    prompt.classList.add('ai-dual');
+    prompt.style.padding = '0';
+    prompt.style.overflow = 'hidden';
+  });
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function switchTab(uid, ai) {
+  // Switch just this one prompt
+  const gptPane = document.getElementById(uid + '-gpt');
+  const claudePane = document.getElementById(uid + '-claude');
+  const container = gptPane.closest('.prompt');
+  const tabs = container.querySelectorAll('.prompt-tab');
+
+  tabs.forEach(t => t.classList.remove('active'));
+  gptPane.classList.remove('active');
+  claudePane.classList.remove('active');
+
+  if (ai === 'gpt') {
+    tabs[0].classList.add('active');
+    gptPane.classList.add('active');
+  } else {
+    tabs[1].classList.add('active');
+    claudePane.classList.add('active');
+  }
+}
+
+function setAI(ai) {
+  currentAI = ai;
+
+  // Update global toggle buttons
+  const btnGpt = document.getElementById('btn-gpt');
+  const btnClaude = document.getElementById('btn-claude');
+  btnGpt.classList.remove('active-chatgpt');
+  btnClaude.classList.remove('active-claude');
+  if (ai === 'gpt') btnGpt.classList.add('active-chatgpt');
+  else btnClaude.classList.add('active-claude');
+
+  // Switch ALL prompt tabs globally
+  document.querySelectorAll('.prompt.ai-dual').forEach(prompt => {
+    const tabs = prompt.querySelectorAll('.prompt-tab');
+    const panes = prompt.querySelectorAll('.prompt-pane');
+    tabs.forEach(t => t.classList.remove('active'));
+    panes.forEach(p => p.classList.remove('active'));
+
+    if (ai === 'gpt') {
+      if (tabs[0]) tabs[0].classList.add('active');
+      if (panes[0]) panes[0].classList.add('active');
+    } else {
+      if (tabs[1]) tabs[1].classList.add('active');
+      if (panes[1]) panes[1].classList.add('active');
+    }
+  });
+}
+
+// Transform all prompts on page load
+document.addEventListener('DOMContentLoaded', () => {
+  transformPrompts();
+});
+
+// Also run immediately in case DOMContentLoaded already fired
+if (document.readyState !== 'loading') {
+  transformPrompts();
+}
 </script>
 
 </body>
